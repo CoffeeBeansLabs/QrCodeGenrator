@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Qr Generator Demo',
+      title: 'Qr Generator App',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -33,7 +33,6 @@ class _GenerateQRPageState extends State<GenerateQRPage> {
   @override
   void initState() {
     super.initState();
-    Timer.periodic(Duration(minutes: 60), (Timer t) =>_fetchPost());
 
   }
 
@@ -41,42 +40,51 @@ class _GenerateQRPageState extends State<GenerateQRPage> {
 
   Future _fetchPost() async  {
 
+
     print('print 1');
-    http.Response response = await http.get(Uri.parse("https://attendance-application-spring.herokuapp.com/qrcode/save"));
+    http.Response response = await http.get(Uri.parse("https://attendance-application-spring.herokuapp.com/qrcode/uniqueId"));
     setState(() {
-      _data = jsonDecode(response.body.toString())['uniqueId'];
+      _data = jsonEncode(response.body.toString());
       print(_data.toString());
     });
-    return "Success";
   }
 
 
   @override
   Widget build(BuildContext context) {
 
-    Timer.periodic(Duration(minutes: 60), (Timer t) => _fetchPost());
+    _fetchPost();
     return Scaffold(
-      appBar: AppBar(
-        title: Center(child: Text('QR GENERATOR')),
-      ),
       body: SingleChildScrollView(
         child: Center(
+          
           child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Center(
-                  child: QrImage(
-                    // data: controller.text,
-                    data:_data.toString(),
-                    size: 400,
-                    embeddedImage: AssetImage('images/logo.png'),
-                    embeddedImageStyle: QrEmbeddedImageStyle(
-                        size: Size(80,80)
+            child: Center(
+              
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                      child: Image.asset('assets/shelf2.png',height: 140,)),
+                  Center(
+                    child: Container(
+                      margin: EdgeInsets.all(40),
+                      child: Container(
+                        margin: EdgeInsets.only(top: 110),
+                        child: QrImage(
+                          // data: controller.text,
+                          data:_data.toString(),
+                          size: 400,
+                          embeddedImage: AssetImage('images/logo.png'),
+                          embeddedImageStyle: QrEmbeddedImageStyle(
+                              size: Size(80,80)
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
