@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_screen_wake/flutter_screen_wake.dart';
 
 void main() {
 
@@ -31,18 +32,28 @@ class GenerateQRPage extends StatefulWidget {
 
 class _GenerateQRPageState extends State<GenerateQRPage> {
   @override
-  void initState() {
+  void initState()  {
     super.initState();
 
+  }
+  Future CallWakeup() async {
+    double brightness = await FlutterScreenWake.brightness;
+
+// Set the brightness:
+    FlutterScreenWake.setBrightness(0.5);
+
+// Check if the screen is kept on:
+    bool isKeptOn = await FlutterScreenWake.isKeptOn;
+
+// Prevent screen from going into sleep mode:
+    FlutterScreenWake.keepOn(true);
   }
 
   var _data;
 
   Future _fetchPost() async  {
-
-
     print('print 1');
-    http.Response response = await http.get(Uri.parse("https://attendance-application-spring.herokuapp.com/qrcode/uniqueId"));
+    http.Response response = await http.get(Uri.parse("https://cbattendanceapp.herokuapp.com/qrcode/uniqueId"));
     setState(() {
       _data = jsonEncode(response.body.toString());
       print(_data.toString());
@@ -54,6 +65,7 @@ class _GenerateQRPageState extends State<GenerateQRPage> {
   Widget build(BuildContext context) {
 
     _fetchPost();
+    CallWakeup();
     return Scaffold(
       body: SingleChildScrollView(
         child: Center(
