@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:http/http.dart' as http;
@@ -52,48 +53,66 @@ class _GenerateQRPageState extends State<GenerateQRPage> {
   var _data;
 
   Future _fetchPost() async  {
-    print('print 1');
-    http.Response response = await http.get(Uri.parse("https://cbattendanceapp.herokuapp.com/qrcode/uniqueId"));
-    setState(() {
-      _data = jsonEncode(response.body.toString());
-      print(_data.toString());
-    });
-  }
+    try{
+      print('print 1');
+      http.Response response = await http.get(Uri.parse("https://coffeebeansbackend.herokuapp.com/qrcode/uniqueId"));
+      setState(() {
+        _data = jsonEncode(response.body.toString());
+        print(_data.toString());
+      });
+    }
+    // on SocketException catch(error) {
+    //   print("network error");
+    //   print("Retrying...");
+    //   _fetchPost();
+    // }
+    catch(error) {
+      print("Unexpected error");
+      print(error);
+      _fetchPost();
+    }
 
+    }
 
   @override
   Widget build(BuildContext context) {
 
-    _fetchPost();
-    CallWakeup();
+    Timer(Duration(milliseconds: 5000),_fetchPost);
+    Timer(Duration(seconds: 0),CallWakeup);
     return Scaffold(
       body: SingleChildScrollView(
         child: Center(
-          
           child: Center(
             child: Center(
-              
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
-                      child: Image.asset('assets/shelf2.png',height: 140,)),
+                      child: Image.asset('assets/shelf2.png',height: 140,)
+                  ),
+
+
+                  Container(
+                    margin: EdgeInsets.only(top: 20),
+                      child: Text("Please visit espresso.coffeebeans.io\nfor marking your attendance.",
+                        style: TextStyle(color:Colors.brown[400],fontSize: 18,fontWeight: FontWeight.w700),)
+                  ),
+
                   Center(
                     child: Container(
-                      margin: EdgeInsets.all(40),
+                      margin: EdgeInsets.all(35),
                       child: Container(
-                        margin: EdgeInsets.only(top: 110),
                         child: QrImage(
-                          // data: controller.text,
                           data:_data.toString(),
-                          size: 400,
-                          embeddedImage: AssetImage('images/logo.png'),
                           embeddedImageStyle: QrEmbeddedImageStyle(
-                              size: Size(80,80)
                           ),
                         ),
                       ),
                     ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.all(20.0),
+                      child: Text("Have a great day ahead😀",style: TextStyle(color: Colors.brown[900],fontSize: 24,fontWeight: FontWeight.w500),)
                   ),
                 ],
               ),
