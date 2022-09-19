@@ -32,6 +32,7 @@ class GenerateQRPage extends StatefulWidget {
 }
 
 class _GenerateQRPageState extends State<GenerateQRPage> {
+  bool isloading=false;
   @override
   void initState()  {
     super.initState();
@@ -53,7 +54,10 @@ class _GenerateQRPageState extends State<GenerateQRPage> {
   var _data;
 
   Future _fetchPost() async  {
+    isloading=true;
+
     try{
+
       print('print 1');
       http.Response response = await http.get(Uri.parse("https://coffeebeansbackend.herokuapp.com/qrcode/uniqueId"));
       setState(() {
@@ -61,25 +65,20 @@ class _GenerateQRPageState extends State<GenerateQRPage> {
         print(_data.toString());
       });
     }
-    // on SocketException catch(error) {
-    //   print("network error");
-    //   print("Retrying...");
-    //   _fetchPost();
-    // }
     catch(error) {
       print("Unexpected error");
       print(error);
       _fetchPost();
     }
-
     }
 
   @override
   Widget build(BuildContext context) {
 
-    Timer(Duration(milliseconds: 5000),_fetchPost);
+    Timer(Duration(milliseconds: 3000),_fetchPost);
     Timer(Duration(seconds: 0),CallWakeup);
     return Scaffold(
+
       body: SingleChildScrollView(
         child: Center(
           child: Center(
@@ -91,7 +90,6 @@ class _GenerateQRPageState extends State<GenerateQRPage> {
                       child: Image.asset('assets/shelf2.png',height: 140,)
                   ),
 
-
                   Container(
                     margin: EdgeInsets.only(top: 20),
                       child: Text("Please visit espresso.coffeebeans.io\nfor marking your attendance.",
@@ -102,11 +100,10 @@ class _GenerateQRPageState extends State<GenerateQRPage> {
                     child: Container(
                       margin: EdgeInsets.all(35),
                       child: Container(
-                        child: QrImage(
+                        child:isloading ?  QrImage(
                           data:_data.toString(),
-                          embeddedImageStyle: QrEmbeddedImageStyle(
-                          ),
-                        ),
+                          embeddedImageStyle: QrEmbeddedImageStyle(),
+                        ):const CircularProgressIndicator(color: Colors.brown,backgroundColor: Colors.white,),
                       ),
                     ),
                   ),
@@ -122,5 +119,8 @@ class _GenerateQRPageState extends State<GenerateQRPage> {
       ),
     );
   }
+
+
+
 
 }
