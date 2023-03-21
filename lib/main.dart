@@ -59,7 +59,7 @@ class _GenerateQRPageState extends State<GenerateQRPage> {
     try{
 
       print('print 1');
-      http.Response response = await http.get(Uri.parse("https://qa-cbattendancebe.coffeebeans.io/qrcode/uniqueId"));
+      http.Response response = await http.get(Uri.parse("https://prod-attendance.coffeebeans.io/qrcode/uniqueId"));
       setState(() {
         _data = jsonEncode(response.body.toString());
         print(_data.toString());
